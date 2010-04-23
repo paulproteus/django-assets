@@ -12,7 +12,7 @@ __all__ = ('Filter', 'CallableFilter', 'get_filter', 'register_filter',)
 
 class NameGeneratingMeta(type):
     """Metaclass that will generate a "name" attribute based on the
-    class name if non is given.
+    class name if none is given.
     """
 
     def __new__(cls, name, bases, attrs):
@@ -207,4 +207,3 @@ def load_builtin_filters():
                             continue
                         register_filter(attr)
 load_builtin_filters()
-del load_builtin_filters

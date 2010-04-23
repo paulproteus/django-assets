@@ -24,7 +24,12 @@ from django import template
 
 from django_assets.conf import settings
 from django_assets.templatetags.assets import AssetsNode as AssetsNodeOriginal
-from django.templatetags.assets import AssetsNode as AssetsNodeMapped
+try:
+    from django.templatetags.assets import AssetsNode as AssetsNodeMapped
+except ImportError:
+    # Since Django #12295, custom templatetags are no longer mapped into
+    # the Django namespace. Support both versions.
+    AssetsNodeMapped = None
 from django_assets.merge import process
 from django_assets import registry, Bundle
 
@@ -71,14 +76,14 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         if len(args) == 0:
-            raise CommandError('You need to specify a subcommand')
+            raise CommandError('You need to specify a subcommand: rebuild')
         elif len(args) > 1:
             raise CommandError('Invalid number of subcommands passed: %s' %
                 ", ".join(args))
         else:
             command = args[0]
 
-        options['verbosity'] = int(options['verbosity'])
+        options['verbosity'] = int(options.get('verbosity', 1))
 
         if command == 'rebuild':
             # Start with the bundles that are defined in code.
@@ -154,7 +159,8 @@ class Command(BaseCommand):
                     # depending on whether the template tag is added to
                     # builtins, or loaded via {% load %}, it will be
                     # available in a different module
-                    if isinstance(node, (AssetsNodeMapped, AssetsNodeOriginal,)):
+                    if node is not None and \
+                       isinstance(node, (AssetsNodeMapped, AssetsNodeOriginal,)):
                         # try to resolve this node's data; if we fail,
                         # then it depends on view data and we cannot
                         # manually rebuild it.

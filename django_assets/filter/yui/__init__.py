@@ -19,7 +19,7 @@ __all__ = ('YUIJSFilter', 'YUICSSFilter',)
 
 class YUIBase(Filter):
 
-    # Will cause this base class no not be loaded.
+    # Will cause this base class not be loaded.
     name = None
 
     def setup(self):
@@ -28,8 +28,8 @@ class YUIBase(Filter):
 
         # We can reasonably expect that java is just on the path, so
         # don't require it, but hope for the best.
-        self.java = self.get_config(env='JAVA_HOME', require=False)
-        if self.java is not None:
+        path = self.get_config(env='JAVA_HOME', require=False)
+        if path is not None:
             self.java = os.path.join(path, 'bin/java')
         else:
             self.java = 'java'
